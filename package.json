@@ -1,0 +1,27 @@
+{
+  "name": "react-para-desarrolladores",
+  "version": "1.0.0",
+  "description": "React para desarrolladores",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mellambias/React-develop.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mellambias/React-develop/issues"
+  },
+  "homepage": "https://github.com/mellambias/React-develop#readme",
+  "devDependencies": {
+    "standard": "^17.1.0"
+  },
+  "eslintConfig":{
+    "extends":"./node_modules/standard/eslintrc.json"
+  }
+
+}
