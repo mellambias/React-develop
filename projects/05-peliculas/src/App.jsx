@@ -1,34 +1,66 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useState } from 'react';
 import './App.css'
+// componentes
+import { Movies } from './components/Movies'
+// hooks
+import { useMovies } from './hooks/useMovies'
+import { useDebounce } from './hooks/useDebounce';
+
+function useSearch() {
+  const [query, setQuery] = useState("")
+  return { query, setQuery }
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [sort, setSort] = useState(false) // indica si debemos ordenar las peliculas por año
+  const { query, setQuery } = useSearch();
+  const { movies, getMovies, loading } = useMovies({ sort });
+  const debounceQuery = useDebounce((newSearch) => {
+    console.log(newSearch);
+    getMovies({ query: newSearch })
+  }, 1000);
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    getMovies({ query })
+  }
+
+  const handleSort = () => {
+    setSort(!sort)
+  }
+
+  const handleChange = (event) => {
+    const newSearch = event.target.value;
+    setQuery(newSearch);
+    debounceQuery(newSearch)
+  }
+  // JSX
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className='page'>
+      <h1>Buscador peliculas</h1>
+      <header>
+        <form className='search' onSubmit={handleSubmit}>
+          <input
+            name="query"
+            value={query}
+            onChange={handleChange}
+            type="text"
+            placeholder='Batman, avengers' />
+          <input
+            type="checkbox"
+            name="sortByTitle"
+            value={sort}
+            onChange={handleSort}
+          />
+          <button type='submit'>Buscar</button>
+        </form>
+      </header>
+      <main>
+        {loading ? <p>Buscando peliculas...</p>
+          : <Movies movies={movies} />
+        }
+      </main>
+    </div>
   )
 }
 
