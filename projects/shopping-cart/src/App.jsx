@@ -3,43 +3,26 @@ import { products as initialProducts } from './mocks/products.json';
 import { Header } from './components/Header';
 import { Products } from './components/Products';
 import { Filters } from './components/Filters';
+import { Footer } from './components/Footer';
+import { Cart } from './components/Cart';
+import { CartProvider } from './context/cart';
+import { useFilters } from './Hooks/useFilters';
+
 
 function App() {
   const [products] = useState(initialProducts);
-
-  // Filtros
-  const [filters, setFilters] = useState({ category: 'all', minPrice: 0 });
-
-  const updateMinPrice = (minPrice) => {
-    setFilters({ category: filters.category, minPrice });
-  }
-  const updateCategory = (category) => {
-    setFilters({ category, minPrice: filters.minPrice });
-  }
-
-
-  const filterProducts = (products) => {
-    return products.filter(product => {
-      return (
-        product.price >= filters.minPrice &&
-        (filters.category === "all" || filters.category === product.category)
-      )
-    });
-  }
-
+  const { filterProducts } = useFilters();
   const filteredProducts = filterProducts(products);
-  const update = {
-    updateMinPrice,
-    updateCategory
-  }
 
   return (
-    <>
+    <CartProvider>
       <Header>
-        <Filters filters={filters} update={update} />
+        <Filters />
+        <Cart />
       </Header>
       <Products products={filteredProducts} />
-    </>
+      <Footer />
+    </CartProvider>
   )
 }
 

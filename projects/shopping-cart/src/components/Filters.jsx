@@ -1,14 +1,14 @@
 /* eslint-disable react/prop-types */
+import { useContext } from 'react';
+import { useId } from "react";
 import './Filters.css'
-import { useId, useState } from "react";
+import { FiltersContext } from '../context/filters';
 
-export function Filters({ filters, update }) {
+export function Filters() {
   const priceId = useId();
   const categoryId = useId();
-  const [price, setPrice] = useState(filters.price || 0);
-
+  const { filters, update } = useContext(FiltersContext);
   const handleRange = (event) => {
-    setPrice(event.target.value);
     update.updateMinPrice(event.target.value);
   }
 
@@ -26,13 +26,13 @@ export function Filters({ filters, update }) {
           min={0}
           max={1000}
           onChange={handleRange}
-          value={price}
+          value={filters.minPrice}
         />
-        <span>{price} &euro;</span>
+        <span>{filters.minPrice} &euro;</span>
       </div>
       <div className='filters-selector'>
         <label htmlFor={categoryId}>Categoria</label>
-        <select name="category" id={categoryId} onChange={handleCategory}>
+        <select name="category" id={categoryId} onChange={handleCategory} value={filters.category}>
           <option value="all">Todas</option>
           <option value="beauty">Belleza</option>
           <option value="fragrances">Fragancias</option>

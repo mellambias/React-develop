@@ -47,3 +47,6 @@
 - Creamos los componentes `Filters` y `Header`
   - `Filter` lo usaremos en el `Header`
   - `Header` lo usamos en `App`
+
+- Extraemos la lógica en un _custom Hook_ `useFilters`
+- Ahora vamos a crear un componente `Footer` para que utilice un contexto
