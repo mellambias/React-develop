@@ -1,8 +1,9 @@
-import { vi } from 'vitest';
-import { render, screen, cleanup } from "@testing-library/react";
-import { describe, it, expect, beforeEach } from "vitest";
-import { Router } from "./Router";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { render, screen, cleanup, fireEvent } from "@testing-library/react";
 import { getCurrentPath } from "../utils";
+import { Router } from "./Router";
+import { Route } from './Route';
+import { Link } from './Link';
 
 // vamos a simular la funcion getCurrentPath para que nos devuelva la ruta actual que nos interese
 vi.mock("../utils", async (importOriginal) => {
@@ -42,5 +43,26 @@ describe("Router", () => {
     ]
     render(<Router routes={routes} />)
     expect(screen.getByText("About")).toBeTruthy()
+  })
+  it("Deberia navegar usando Links", async () => {
+    getCurrentPath.mockReturnValueOnce('/')
+
+    render(
+      <Router >
+        <Route path="/" component={() => {
+          return (
+            <>
+              <h1>Home</h1>
+              <Link to="/about">Ir a About</Link>
+            </>
+          )
+        }} />
+        <Route path="/about" component={() => <h1>About</h1>} />
+      </Router>
+    )
+    const link = screen.getByText(/Ir a About/)
+    fireEvent.click(link)
+    const aboutText = await screen.getByText("About")
+    expect(aboutText).toBeTruthy()
   })
 })
