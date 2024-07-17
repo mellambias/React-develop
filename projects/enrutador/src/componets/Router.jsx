@@ -2,14 +2,15 @@ import { useEffect, useState } from "react";
 import { EVENTS } from "../consts";
 import { Page404 } from "../pages/404";
 import { match } from "path-to-regexp";
+import { Children } from "react";
+import { getCurrentPath } from "../utils";
 
-function Router({ routes = [] }) {
+function Router({ children, routes = [] }) {
 
-  const [currentPath, setCurrentPath] = useState(window.location.pathname);
+  const [currentPath, setCurrentPath] = useState(getCurrentPath());
   useEffect(() => {
     const onLocationChange = () => {
-      console.log(window.location.pathname)
-      setCurrentPath(window.location.pathname);
+      setCurrentPath(getCurrentPath());
     }
     window.addEventListener(EVENTS.PUSHSTATE, onLocationChange)
     window.addEventListener(EVENTS.POPSTATE, onLocationChange)
@@ -23,12 +24,17 @@ function Router({ routes = [] }) {
 
   let routeParams = {}
 
+  // Añadimos las rutas configuradas en los hijos
+  // utilizaremos la utilidad de react Children que permite leer sus hijos
+  const routesFromChildren = Children.map(children, ({ props, type }) => {
+    return type.name === "Route" ? props : null
+  })
 
-  const Page = routes.find(({ path }) => {
+  const routesToUse = routes.concat(routesFromChildren).filter(Boolean);
+
+  const Page = routesToUse.find(({ path }) => {
     // Si el path coincide
     if (path === currentPath) return true
-    console.log("path", path, currentPath);
-
     // Creamos una función para encontrar coincidencias con la ruta dinamica
     // /about/:query
     const matcherUrl = match(path, { decode: decodeURIComponent })

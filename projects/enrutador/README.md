@@ -5,10 +5,11 @@
 - [x] Crea una forma de navegar al estilo de una Single Page Aplication (SPA)
 - [x] Hacer que la navegación entre páginas utilice el boton atras
 - [x] Crea un componente `Link` que pertita establecer los enlaces de navegación
-- [x] Crea un componente `Route` que agrupe rutas
+- [x] Crea un componente `Router` que agrupe rutas
 - [x] Hacer que la ruta por defecto sea 404
 - [x] Implementar rutas con parámetros
-- [] Implementar la carga bajo de manda de rutas (lazy load)
+- [x] Crea un componente `Route` para cada ruta
+- [x] Implementar la carga bajo de manda de rutas (lazy load)
 - [] Realizar pruebas
 - [] Publicar el paquete
 
@@ -138,10 +139,131 @@ Para hacer esto vamos a utilizar el paquete [`path-to-regexp`](github.com/pillar
 pnpm install path-to-regexp -E
 ```
 
-## Implementar la carga bajo de manda de rutas (lazy load)
+- Analizamos la ruta actual con el patrón suministrado por `path` y devolvemos el componente
+
+```jsx
+  ...
+  const Page = routes.find(({ path }) => {
+      // Si el path coincide
+      if (path === currentPath) return true
+
+      // Creamos una función para encontrar coincidencias con la ruta dinamica
+      // /about/:query
+      const matcherUrl = match(path, { decode: decodeURIComponent })
+      // buscamos las coincidencias con nuestra ruta actual
+      // /about/react
+      const matched = matcherUrl(currentPath);
+      if (!matched) return false
+      // Guardamos las coincidencias
+      // matched.params.query === 'react'
+      routeParams = matched.params
+      return true
+    })?.component
+    return Page
+      ? <Page routeParams={routeParams} />
+      : <Page404 routeParams={routeParams} />
+```
+
+## Crea un componente `Route` para cada ruta
 
 [**jsdom**](https://www.npmjs.com/package/jsdom)
 
 is a pure-JavaScript implementation of many web standards, notably the WHATWG* DOM and HTML Standards, for use with Node.js. In general, the goal of the project is to emulate enough of a subset of a web browser to be useful for testing and scraping real-world web applications.
 
 *Web Hypertext Application Technology Working Group
+
+- Creamos un componente `Route` que renderiza `null`. Este será utilizado para leer sus propiedades desde `Router`
+- Utilizaremos la utilidad de react `Children` que nos permite acceder a los hijos como elementos iterables
+- Añadimos a `routes` los valores leidos en los hijos
+
+```js
+  const routesFromChildren = Children.map(children, ({ props, type }) => {
+    return type.name === "Route" ? props : null
+  })
+```
+
+- Unimos las dos rutas, la que proviene del atributo `routes` y las definidas en los hijos `Route` y eliminamos los null
+
+```js
+const routesToUse = routes.concat(routesFromChildren).filter(Boolean);
+```
+
+## Implementar la carga bajo de manda de rutas (lazy load)
+
+- Vamos a utilizar  la funcion de react `lazy` que nos permite cargar de forma dinámica los componentes
+- Para importar de forma dinámica utilizamos promesas
+
+```js
+import AboutPage from './pages/About.jsx' <- importación estática 
+import ('./pages/About.jsx') <- importación dinámica que devuelve una promesa
+```
+
+React ejecutará el import dinamico cuando necesite renderizar el componente convirtiendose así en un _componente dinámico_
+
+```js
+const AboutPage = lazy(()=>import ('./pages/About.jsx'))
+```
+
+Los componentes dinámicos no estan disponibles para la UI por lo que hay que envolverlos en otro componente
+el `<Suspense></Suspense>`
+
+```jsx
+const HomePage = lazy(() => import('./pages/Home.jsx'))
+const AboutPage = lazy(() => import('./pages/About.jsx'))
+const SearchPage = lazy(() => import('./pages/search.jsx'))
+
+function App() {
+
+  return (
+    <main>
+      <Suspense fallback={<div>Loading...</div>}>
+        < Router routes={appRoutes} >
+          <Route path="/" component={HomePage} />
+          <Route path="/about" component={AboutPage} />
+        </Router>
+      </Suspense>
+    </main>
+  )
+}
+```
+
+## Realizar pruebas
+
+- Para la pruebas utilizaremos `vitest`
+
+```shell
+pnpm install vitest -D
+```
+
+- al `package.json` añadimos a los `scripts`
+  "test": "vitest"
+
+vamos a probar el router `Router.test.jsx`
+
+- Como son componentes de React, necesitamos renderizarlos usaremos [**happy-dom**](github.com/capricorn86/happy-dom)
+
+> A JavaScript implementation of a web browser without its graphical user interface.
+
+- Como libreria especializada [**@testing-library/react**](https://testing-library.com/docs/react-testing-library/intro/)
+- Como libreria especializada [**@testing-library/dom**](https://testing-library.com/docs/dom-testing-library/intro/)
+
+>React Testing Library builds on top of DOM Testing Library by adding APIs for working with React components.
+
+```shell
+pnpm install happy-dom @testing-library/dom @testing-library/react -D
+```
+
+- En la configuración de vite `vite.config.js` tenemos que añadir el entorno de test:
+
+```js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react-swc'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+  test: {
+    environment: 'happy-dom'
+  }
+})
+```

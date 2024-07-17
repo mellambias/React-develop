@@ -1,18 +1,13 @@
 import './App.css'
-import HomePage from './pages/Home.jsx'
-import AboutPage from './pages/About.jsx'
 import { Router } from './componets/Router.jsx'
-import { SearchPage } from './pages/search.jsx';
+import { Route } from './componets/Route.jsx'
+import { lazy } from 'react';
+import { Suspense } from 'react';
+const HomePage = lazy(() => import('./pages/Home.jsx'))
+const AboutPage = lazy(() => import('./pages/About.jsx'))
+const SearchPage = lazy(() => import('./pages/search.jsx'))
 
 const appRoutes = [
-  {
-    path: "/",
-    component: HomePage
-  },
-  {
-    path: "/about",
-    component: AboutPage
-  },
   {
     path: "/search/:query",
     component: SearchPage
@@ -22,9 +17,14 @@ const appRoutes = [
 function App() {
 
   return (
-    <>
-      <Router routes={appRoutes} />
-    </>
+    <main>
+      <Suspense fallback={<div>Loading...</div>}>
+        < Router routes={appRoutes} >
+          <Route path="/" component={HomePage} />
+          <Route path="/about" component={AboutPage} />
+        </Router>
+      </Suspense>
+    </main>
   )
 }
 

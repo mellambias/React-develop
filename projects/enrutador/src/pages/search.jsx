@@ -7,4 +7,4 @@ function SearchPage({ routeParams }) {
   )
 }
 
-export { SearchPage }
+export default SearchPage
