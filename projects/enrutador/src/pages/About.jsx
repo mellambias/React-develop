@@ -1,4 +1,4 @@
-import { Link } from "../componets/Link"
+import { Link } from "../components/Link"
 
 function AboutPage() {
   return (

@@ -1,12 +1,12 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, cleanup, fireEvent } from "@testing-library/react";
-import { getCurrentPath } from "../utils";
-import { Router } from "./Router";
-import { Route } from './Route';
-import { Link } from './Link';
+import { getCurrentPath } from "../utils/utils";
+import { Router } from "../components/Router";
+import { Route } from '../components/Route';
+import { Link } from '../components/Link';
 
 // vamos a simular la funcion getCurrentPath para que nos devuelva la ruta actual que nos interese
-vi.mock("../utils", async (importOriginal) => {
+vi.mock("../utils/utils", async (importOriginal) => {
   const originalModule = await importOriginal()
   return {
     ...originalModule,

@@ -1,22 +1,37 @@
 {
   "name": "enrutador",
-  "private": true,
-  "version": "0.0.0",
+  "private": false,
+  "version": "0.0.1",
   "type": "module",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "exports":{
+    ".":{
+      "import":"./lib/index.js",
+      "require":"./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "prepare": "npm run test &&  swc --source-maps -d lib src/components src/utils src/index.jsx ",
     "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
     "preview": "vite preview",
-    "test": "vitest",
+    "test": "echo",
+    "test:watch": "vitest",
     "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "path-to-regexp": "7.1.0",
+    "path-to-regexp": "7.1.0"
+  },
+  "peerDependencies":{
     "react": "18.3.1",
     "react-dom": "18.3.1"
   },
   "devDependencies": {
+    "@swc/cli": "^0.4.0",
+    "@swc/core": "^1.6.13",
     "@testing-library/dom": "10.3.2",
     "@testing-library/react": "16.0.0",
     "@types/react": "18.3.3",
@@ -30,5 +45,10 @@
     "happy-dom": "14.12.3",
     "vite": "5.3.4",
     "vitest": "2.0.3"
+  },
+  "eslintConfig": {
+    "extends": [
+      "./node_modules/standard/eslintrc.json"
+    ]
   }
 }

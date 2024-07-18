@@ -3,7 +3,7 @@ import { EVENTS } from "../consts";
 import { Page404 } from "../pages/404";
 import { match } from "path-to-regexp";
 import { Children } from "react";
-import { getCurrentPath } from "../utils";
+import { getCurrentPath } from "../utils/utils";
 
 function Router({ children, routes = [] }) {
 

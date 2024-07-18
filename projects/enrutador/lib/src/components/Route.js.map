@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/components/Route.jsx"],"sourcesContent":["/* \r\n  Este componente no renderiza ya que se utiliza solo como medio para leer sus \r\n  propiedades desde el componente padre\r\n*/\r\n\r\nfunction Route() {\r\n  return null;\r\n}\r\n\r\nexport { Route }"],"names":["Route"],"mappings":"AAKA,SAASA,QACP,OAAO,IACT,CAEA,OAASA,KAAK,CAAE"}

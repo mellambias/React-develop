@@ -10,7 +10,7 @@
 - [x] Implementar rutas con parámetros
 - [x] Crea un componente `Route` para cada ruta
 - [x] Implementar la carga bajo de manda de rutas (lazy load)
-- [] Realizar pruebas
+- [x] Realizar pruebas
 - [] Publicar el paquete
 
 ## Instalar el linter
@@ -267,3 +267,98 @@ export default defineConfig({
   }
 })
 ```
+
+## Publicar el paquete como un módulo
+
+- En el `package.json` añadimos un script llamado `prepare` que se ejecuta antes del `publish`
+
+**Vite** esta pensado para empaquetar la aplicación completa, para empaquetar módulos utilizaremos directamente SWC.
+
+- Instalamos en el proyecto el compilador [**SWC**](https://swc.rs/)
+
+```shell
+pnpm i -D @swc/cli @swc/cor
+```
+
+- Creamos un fichero de configuración `.swcrc` para activar ciertas opciones
+
+```json
+{
+ "$schema": "https://swc.rs/schema.json",
+ "jsc": {
+ "parser": {
+  "syntax": "ecmascript",
+  "jsx": true,
+  "dynamicImport": false,
+  "privateMethod": false,
+  "functionBind": false,
+  "exportDefaultFrom": false,
+  "exportNamespaceFrom": false,
+  "decorators": false,
+  "decoratorsBeforeExport": false,
+  "topLevelAwait": false,
+  "importMeta": false
+ },
+ "transform": {
+    "react":{
+      "runtime": "automatic"
+    }
+ },
+ "target": "es2020",
+ "loose": true,
+ "externalHelpers": false,
+ // Requires v1.2.50 or upper and requires target to be es2016 or upper.
+ "keepClassNames": false
+ },
+ "minify": true
+}
+```
+
+Procesa y muestra en la salida estandard
+
+```shell
+npx swc ./src/components/Router.jsx
+```
+
+- Modificamos el `package.json`
+  - Pasamos las dependencias de "react": "18.3.1" y "react-dom": "18.3.1" a "peerDependencies" de este modo el proyecto
+  al que se instale deberá tener estas dependencias instaladas
+  - Cambiamos `version` y `private`
+  - establecemos un punto de entrada al módulo
+    - Crear un fichero `index.jsx` en el que **exportaremos** todos los componentes
+    - establecemos los atributos `main` y `module` cuyo valor será el fichero `lib/index.js` que será el resultado de compilar el `index.jsx`
+  - Establecemos los puntos de acceso al módulo cuando se use `import` o `require`
+
+  ```json
+  "version": "0.0.1",
+  "type": "module",
+  "main": "lib/index.js",
+  "module": "lib/index.js",
+  "exports": {
+    ".": {
+      "import": "./lib/index.js",
+      "require": "./lib/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  ```
+
+- El script `prepare` compilará los componentes, utilidades y el indice y pondrá su resultado en el directorio lib
+
+```json
+"prepare": "npm run test && swc src/components src/utils src/index.jsx -d lib",
+```
+
+- Creamos en la raiz del proyecto un fichero `.npmignore` con los directorios y archivos que no deben subir a NPM
+
+```text
+src
+public
+index.html
+pnpm-lock.yaml
+vite.config.js
+.swcrc
+```
+
+[publicar en NPM](https://www.youtube.com/watch?v=SgmkNLFFCjM)
+pnpm link

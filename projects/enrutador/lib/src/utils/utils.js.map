@@ -1,0 +1,1 @@
+{"version":3,"sources":["../../../src/utils/utils.js"],"sourcesContent":["function getCurrentPath() {\r\n  return window.location.pathname;\r\n}\r\n\r\nexport { getCurrentPath };\r\n"],"names":["getCurrentPath","window","location","pathname"],"mappings":"AAAA,SAASA,iBACP,OAAOC,OAAOC,QAAQ,CAACC,QAAQ,AACjC,CAEA,OAASH,cAAc,CAAG"}
